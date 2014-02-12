@@ -374,7 +374,7 @@ function edd_getresponse_load() {
         return EDD_GetResponse::instance();
     }
 }
-
+add_action( 'plugins_loaded', 'edd_getresponse_load' );
 
 /**
  * We need Easy Digital Downloads... if it isn't present, notify the user!
