@@ -3,13 +3,14 @@
  * Plugin Name:     Easy Digital Downloads - GetResponse
  * Plugin URI:      https://easydigitaldownloads.com/extension/getresponse/
  * Description:     Include a GetResponse signup option with your Easy Digital Downloads checkout
- * Version:         1.0.8
+ * Version:         1.1.0
  * Author:          Daniel J Griffiths
  * Author URI:      http://ghost1227.com
+ * Text Domain:		edd-getresponse
  *
  * @package         EDD\GetResponse
  * @author          Daniel J Griffiths <dgriffiths@ghost1227.com>
- * @copyright       Copyright (c) 2013, Daniel J Griffiths
+ * @copyright       Copyright (c) 2013-2014, Daniel J Griffiths
  */
 
 
@@ -28,7 +29,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 	class EDD_GetResponse {
 
         /**
-         * @var         \EDD_GetResponse $instance The one true EDD_GetResponse
+         * @var         EDD_GetResponse $instance The one true EDD_GetResponse
          * @since       1.0.3
          */
 		private static $instance;
@@ -39,13 +40,12 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 		 *
 		 * @access		public
 		 * @since		1.0.3
-		 * @return		self::$instance The one true EDD_GetResponse
+		 * @return		object self::$instance The one true EDD_GetResponse
 		 */
 		public static function instance() {
 			if( !self::$instance ) {
                 self::$instance = new EDD_GetResponse();
                 self::$instance->setup_constants();
-                self::$instance->includes();
                 self::$instance->load_textdomain();
                 self::$instance->hooks();
             }
@@ -63,7 +63,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 		 */
         public function setup_constants() {
             // Plugin version
-            define( 'EDD_GETRESPONSE_VERSION', '1.0.8' );
+            define( 'EDD_GETRESPONSE_VERSION', '1.1.0' );
 
             // Plugin path
             define( 'EDD_GETRESPONSE_DIR', plugin_dir_path( __FILE__ ) );
@@ -74,21 +74,6 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             // GetResponse API URL
 			define( 'EDD_GETRESPONSE_API_URL', 'http://api2.getresponse.com' );
 		}
-
-
-        /**
-         * Include necessary files
-         *
-         * @access      private
-         * @since       1.0.7
-         * @return      void
-         */
-        private function includes() {
-            // Load our custom updater
-            if( !class_exists( 'EDD_License' ) ) {
-                include_once EDD_GETRESPONSE_DIR . '/includes/libraries/EDD_SL/EDD_License_Handler.php';
-            }
-        }
 
 
 		/**
@@ -106,7 +91,9 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             add_filter( 'edd_settings_extensions', array( $this, 'settings' ), 1 );
 
 			// Handle licensing
-            $license = new EDD_License( __FILE__, 'GetResponse', EDD_GETRESPONSE_VERSION, 'Daniel J Griffiths' );
+			if( class_exists( 'EDD_License' ) ) {
+	            $license = new EDD_License( __FILE__, 'GetResponse', EDD_GETRESPONSE_VERSION, 'Daniel J Griffiths' );
+			}
 
 			// Add GetResponse checkbox to checkout page
 			add_action( 'edd_purchase_form_after_cc_form', array( $this, 'add_fields' ), 999 );
@@ -165,7 +152,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 );
 
                 $docs_link = array(
-                    '<a href="http://support.ghost1227.com/section/edd-getresponse/" target="_blank">' . __( 'Docs', 'edd-getresponse' ) . '</a>'
+                    '<a href="http://section214.com/docs/category/edd-getresponse/" target="_blank">' . __( 'Docs', 'edd-getresponse' ) . '</a>'
                 );
 
                 $links = array_merge( $links, $help_link, $docs_link );
@@ -181,12 +168,9 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 		 * @access		public
 		 * @since		1.0.0
          * @param		array $settings The existing plugin settings
-         * @global      array $edd_options The EDD settings array
 		 * @return		array The modified plugin settings
 		 */
         public function settings( $settings ) {
-            global $edd_options;
-
             // Just in case the API key isn't set yet
             $edd_getresponse_settings_2 = array();
 
@@ -214,7 +198,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 ),
             );
 
-            if( isset( $edd_options['edd_getresponse_api'] ) && strlen( trim( $edd_options['edd_getresponse_api'] ) ) > 0 ) {
+            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
                 $edd_getresponse_settings_2 = array(
     				array(
 	    				'id'	=> 'edd_getresponse_list',
@@ -226,7 +210,6 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 );
             }
 			
-
 			return array_merge( $settings, array_merge( $edd_getresponse_settings, $edd_getresponse_settings_2 ) );
 		}
 
@@ -236,14 +219,12 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          *
          * @access      public
          * @since	    1.0.0
-         * @global      array $edd_options The EDD settings array
 		 * @return	    array The list of available campaigns
 		 */
 		public function get_campaigns() {
-			global $edd_options;
 
 			// Make sure we have an API key in the database
-			if( isset( $edd_options['edd_getresponse_api'] ) && strlen( trim( $edd_options['edd_getresponse_api'] ) ) > 0 ) {
+			if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
 
 				// Get campaign list from GetResponse
 				$campaigns = array();
@@ -278,13 +259,10 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 		 * @since		1.0.0
 		 * @param		string $email The email address to register
          * @param		string $name The name of the user
-         * @global      array $edd_options The EDD settings array
 		 * @return		boolean True if the email can be subscribed, false otherwise
 		 */
 		public function subscribe_email( $email, $name ) {
-			global $edd_options;
-
-			if( isset( $edd_options['edd_getresponse_api'] ) && strlen( trim( $edd_options['edd_getresponse_api'] ) ) > 0 ) {
+			if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
 
 				if( ! class_exists( 'jsonRPCClient' ) ) {
                     require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
@@ -293,7 +271,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 try{
 				    $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
 
-    				$params = array( 'campaign' => $edd_options['edd_getresponse_list'], 'name' => $name, 'email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'], 'cycle_day' => 0 );
+    				$params = array( 'campaign' => edd_get_option( 'edd_getresponse_list', '' ), 'name' => $name, 'email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'], 'cycle_day' => 0 );
 
                     $return = $api->add_contact( $edd_options['edd_getresponse_api'], $params );
                 } catch( Exception $e ) {
@@ -312,19 +290,16 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          *
          * @access      public
          * @since		1.0.0
-         * @global      array $edd_options The EDD settings array
 		 * @return		void
 		 */
 		public function add_fields() {
-			global $edd_options;
-
 			ob_start();
 
-			if( isset( $edd_options['edd_getresponse_api'] ) && strlen( trim( $edd_options['edd_getresponse_api'] ) ) > 0 ) {
+			if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
 				echo '<fieldset id="edd_getresponse">';
 				echo '<label for="edd_getresponse_signup">';
 				echo '<input name="edd_getresponse_signup" id="edd_getresponse_signup" type="checkbox" checked="checked" />';
-				echo isset( $edd_options['edd_getresponse_label'] ) ? $edd_options['edd_getresponse_label'] : __( 'Sign up for our mailing list', 'edd-getresponse' );
+				echo edd_get_option( 'edd_getresponse_label' ) ? edd_get_option( 'edd_getresponse_label' ) : __( 'Sign up for our mailing list', 'edd-getresponse' );
 			   	echo '</label>';
 				echo '</fieldset>';
 			}
@@ -360,21 +335,19 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
  * @since       1.0.3
  * @return      \EDD_GetResponse The one true EDD_GetResponse
  */
-function edd_getresponse_load() {
-    // We need access to deactivate_plugins()
-    include_once ABSPATH . 'wp-admin/includes/plugin.php';
-
+function EDD_GetResponse_load() {
     if( !class_exists( 'Easy_Digital_Downloads' ) ) {
         deactivate_plugins( __FILE__ );
         unset( $_GET['activate'] );
 
         // Display notice
-        add_action( 'admin_notices', 'edd_getresponse_missing_edd_notice' );
+        add_action( 'admin_notices', 'EDD_GetResponse_missing_edd_notice' );
     } else {
         return EDD_GetResponse::instance();
     }
 }
-add_action( 'plugins_loaded', 'edd_getresponse_load' );
+add_action( 'plugins_loaded', 'EDD_GetResponse_load' );
+
 
 /**
  * We need Easy Digital Downloads... if it isn't present, notify the user!
@@ -382,10 +355,6 @@ add_action( 'plugins_loaded', 'edd_getresponse_load' );
  * @since       1.0.7
  * @return      void
  */
-function edd_getresponse_missing_edd_notice() {
+function EDD_GetResponse_missing_edd_notice() {
     echo '<div class="error"><p>' . __( 'GetResponse requires Easy Digital Downloads! Please install it to continue!', 'edd-getresponse' ) . '</p></div>';
 }
-
-
-// Off we go!
-edd_getresponse_load();
