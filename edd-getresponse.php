@@ -6,7 +6,7 @@
  * Version:         1.1.0
  * Author:          Daniel J Griffiths
  * Author URI:      http://ghost1227.com
- * Text Domain:		edd-getresponse
+ * Text Domain:     edd-getresponse
  *
  * @package         EDD\GetResponse
  * @author          Daniel J Griffiths <dgriffiths@ghost1227.com>
@@ -26,41 +26,41 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
      *
      * @since       1.0.3
      */
-	class EDD_GetResponse {
+    class EDD_GetResponse {
 
         /**
          * @var         EDD_GetResponse $instance The one true EDD_GetResponse
          * @since       1.0.3
          */
-		private static $instance;
+        private static $instance;
 
 
-		/**
-		 * Get active instance
-		 *
-		 * @access		public
-		 * @since		1.0.3
-		 * @return		object self::$instance The one true EDD_GetResponse
-		 */
-		public static function instance() {
-			if( !self::$instance ) {
+        /**
+         * Get active instance
+         *
+         * @access      public
+         * @since       1.0.3
+         * @return      object self::$instance The one true EDD_GetResponse
+         */
+        public static function instance() {
+            if( !self::$instance ) {
                 self::$instance = new EDD_GetResponse();
                 self::$instance->setup_constants();
                 self::$instance->load_textdomain();
                 self::$instance->hooks();
             }
 
-			return self::$instance;
-		}
+            return self::$instance;
+        }
 
 
-		/**
-		 * Setup plugin constants
-		 *
-		 * @access		private
-		 * @since		1.0.7
-		 * @return		void
-		 */
+        /**
+         * Setup plugin constants
+         *
+         * @access      private
+         * @since       1.0.7
+         * @return      void
+         */
         public function setup_constants() {
             // Plugin version
             define( 'EDD_GETRESPONSE_VERSION', '1.1.0' );
@@ -72,17 +72,17 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             define( 'EDD_GETRESPONSE_URL', plugin_dir_url( __FILE__ ) );
 
             // GetResponse API URL
-			define( 'EDD_GETRESPONSE_API_URL', 'http://api2.getresponse.com' );
-		}
+            define( 'EDD_GETRESPONSE_API_URL', 'http://api2.getresponse.com' );
+        }
 
 
-		/**
-		 * Run action and filter hooks
-		 *
-		 * @access		private
-		 * @since		1.0.3
-		 * @return		void
-		 */
+        /**
+         * Run action and filter hooks
+         *
+         * @access      private
+         * @since       1.0.3
+         * @return      void
+         */
         private function hooks() {
             // Edit plugin metadata
             add_filter( 'plugin_row_meta', array( $this, 'plugin_metalinks' ), null, 2 );
@@ -90,30 +90,30 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             // Register settings
             add_filter( 'edd_settings_extensions', array( $this, 'settings' ), 1 );
 
-			// Handle licensing
-			if( class_exists( 'EDD_License' ) ) {
-	            $license = new EDD_License( __FILE__, 'GetResponse', EDD_GETRESPONSE_VERSION, 'Daniel J Griffiths' );
-			}
+            // Handle licensing
+            if( class_exists( 'EDD_License' ) ) {
+                $license = new EDD_License( __FILE__, 'GetResponse', EDD_GETRESPONSE_VERSION, 'Daniel J Griffiths' );
+            }
 
-			// Add GetResponse checkbox to checkout page
-			add_action( 'edd_purchase_form_after_cc_form', array( $this, 'add_fields' ), 999 );
+            // Add GetResponse checkbox to checkout page
+            add_action( 'edd_purchase_form_after_cc_form', array( $this, 'add_fields' ), 999 );
 
-			// Check if a user should be subscribed
-			add_action( 'edd_checkout_before_gateway', array( $this, 'signup_check' ), 10, 2 );
-		}
+            // Check if a user should be subscribed
+            add_action( 'edd_checkout_before_gateway', array( $this, 'signup_check' ), 10, 2 );
+        }
 
 
-		/**
-		 * Internationalization
-		 *
-		 * @access		public
-		 * @since		1.0.3
-		 * @return		void
-		 */
-		public static function load_textdomain() {
-			// Set filter for languages directory
-			$lang_dir = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
-			$lang_dir = apply_filters( 'edd_getresponse_languages_directory', $lang_dir );
+        /**
+         * Internationalization
+         *
+         * @access      public
+         * @since       1.0.3
+         * @return      void
+         */
+        public static function load_textdomain() {
+            // Set filter for languages directory
+            $lang_dir = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
+            $lang_dir = apply_filters( 'edd_getresponse_languages_directory', $lang_dir );
 
             // Traditional WordPress plugin locale filter
             $locale     = apply_filters( 'plugin_locale', get_locale(), 'edd-getresponse' );
@@ -133,7 +133,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 // Load the default language files
                 load_plugin_textdomain( 'edd-getresponse', false, $lang_dir );
             }
-		}
+        }
 
 
         /**
@@ -162,116 +162,116 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
         }
 
 
-		/**
-		 * Add settings
-		 *
-		 * @access		public
-		 * @since		1.0.0
-         * @param		array $settings The existing plugin settings
-		 * @return		array The modified plugin settings
-		 */
+        /**
+         * Add settings
+         *
+         * @access      public
+         * @since       1.0.0
+         * @param       array $settings The existing plugin settings
+         * @return      array The modified plugin settings
+         */
         public function settings( $settings ) {
             // Just in case the API key isn't set yet
             $edd_getresponse_settings_2 = array();
 
-			$edd_getresponse_settings = array(
-				array(
-					'id'	=> 'edd_getresponse_settings',
-					'name'	=> '<strong>' . __( 'GetResponse Settings', 'edd-getresponse' ) . '</strong>',
-					'desc'	=> __( 'Configure GetResponse Integrations Settings', 'edd-getresponse' ),
-					'type'	=> 'header'
-				),
-				array(
-					'id'	=> 'edd_getresponse_api',
-					'name'	=> __( 'GetResponse API Key', 'edd-getresponse' ),
-					'desc'	=> __( 'Enter your GetResponse API key', 'edd-getresponse' ),
-					'type'	=> 'text',
-					'size'	=> 'regular'
-				),
-				array(
-					'id'	=> 'edd_getresponse_label',
-					'name'	=> __( 'Checkbox Label', 'edd-getresponse' ),
-					'desc'	=> __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
-					'type'	=> 'text',
-					'size'	=> 'regular',
-					'std'	=> __( 'Sign up for our mailing list', 'edd-getresponse' ) 
+            $edd_getresponse_settings = array(
+                array(
+                    'id'    => 'edd_getresponse_settings',
+                    'name'  => '<strong>' . __( 'GetResponse Settings', 'edd-getresponse' ) . '</strong>',
+                    'desc'  => __( 'Configure GetResponse Integrations Settings', 'edd-getresponse' ),
+                    'type'  => 'header'
+                ),
+                array(
+                    'id'    => 'edd_getresponse_api',
+                    'name'  => __( 'GetResponse API Key', 'edd-getresponse' ),
+                    'desc'  => __( 'Enter your GetResponse API key', 'edd-getresponse' ),
+                    'type'  => 'text',
+                    'size'  => 'regular'
+                ),
+                array(
+                    'id'    => 'edd_getresponse_label',
+                    'name'  => __( 'Checkbox Label', 'edd-getresponse' ),
+                    'desc'  => __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
+                    'type'  => 'text',
+                    'size'  => 'regular',
+                    'std'   => __( 'Sign up for our mailing list', 'edd-getresponse' ) 
                 ),
             );
 
             if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
                 $edd_getresponse_settings_2 = array(
-    				array(
-	    				'id'	=> 'edd_getresponse_list',
-		    			'name'	=> __( 'Choose a Campaign', 'edd-getresponse' ),
-			    		'desc'	=> __( 'Select the campaign you wish to subscribe buyers to', 'edd-getresponse' ),
-				    	'type'	=> 'select',
-					    'options'	=> $this->get_campaigns()
-				    ),
+                    array(
+                        'id'    => 'edd_getresponse_list',
+                        'name'  => __( 'Choose a Campaign', 'edd-getresponse' ),
+                        'desc'  => __( 'Select the campaign you wish to subscribe buyers to', 'edd-getresponse' ),
+                        'type'  => 'select',
+                        'options'   => $this->get_campaigns()
+                    ),
                 );
             }
-			
-			return array_merge( $settings, array_merge( $edd_getresponse_settings, $edd_getresponse_settings_2 ) );
-		}
+            
+            return array_merge( $settings, array_merge( $edd_getresponse_settings, $edd_getresponse_settings_2 ) );
+        }
 
 
-		/**
-		 * Get GetResponse subscription lists
+        /**
+         * Get GetResponse subscription lists
          *
          * @access      public
-         * @since	    1.0.0
-		 * @return	    array The list of available campaigns
-		 */
-		public function get_campaigns() {
+         * @since       1.0.0
+         * @return      array The list of available campaigns
+         */
+        public function get_campaigns() {
 
-			// Make sure we have an API key in the database
-			if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
+            // Make sure we have an API key in the database
+            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
 
-				// Get campaign list from GetResponse
-				$campaigns = array();
+                // Get campaign list from GetResponse
+                $campaigns = array();
 
-				if( !class_exists( 'jsonRPCClient' ) ) {
-                    require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
-                }
-
-				try{
-				    $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
-
-					$return = $api->get_campaigns( $edd_options['edd_getresponse_api'] );
-                } catch( Exception $e ) {
-					$return[] =  array( 'name' => __( 'Invalid API key or API timeout!', 'edd-getresponse' ) );
-				}
-
-				foreach( $return as $campaign_id => $campaign_info ) {
-					$campaigns[$campaign_id] = $campaign_info['name'];
-				}
-
-				return $campaigns;
-			}
-
-			return array();
-		}
-
-
-		/**
-		 * Add email to GetResponse list
-         *
-         * @access      public
-		 * @since		1.0.0
-		 * @param		string $email The email address to register
-         * @param		string $name The name of the user
-		 * @return		boolean True if the email can be subscribed, false otherwise
-		 */
-		public function subscribe_email( $email, $name ) {
-			if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
-
-				if( ! class_exists( 'jsonRPCClient' ) ) {
+                if( !class_exists( 'jsonRPCClient' ) ) {
                     require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
                 }
 
                 try{
-				    $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
+                    $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
 
-    				$params = array( 'campaign' => edd_get_option( 'edd_getresponse_list', '' ), 'name' => $name, 'email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'], 'cycle_day' => 0 );
+                    $return = $api->get_campaigns( $edd_options['edd_getresponse_api'] );
+                } catch( Exception $e ) {
+                    $return[] =  array( 'name' => __( 'Invalid API key or API timeout!', 'edd-getresponse' ) );
+                }
+
+                foreach( $return as $campaign_id => $campaign_info ) {
+                    $campaigns[$campaign_id] = $campaign_info['name'];
+                }
+
+                return $campaigns;
+            }
+
+            return array();
+        }
+
+
+        /**
+         * Add email to GetResponse list
+         *
+         * @access      public
+         * @since       1.0.0
+         * @param       string $email The email address to register
+         * @param       string $name The name of the user
+         * @return      boolean True if the email can be subscribed, false otherwise
+         */
+        public function subscribe_email( $email, $name ) {
+            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
+
+                if( ! class_exists( 'jsonRPCClient' ) ) {
+                    require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
+                }
+
+                try{
+                    $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
+
+                    $params = array( 'campaign' => edd_get_option( 'edd_getresponse_list', '' ), 'name' => $name, 'email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'], 'cycle_day' => 0 );
 
                     $return = $api->add_contact( $edd_options['edd_getresponse_api'], $params );
                 } catch( Exception $e ) {
@@ -279,52 +279,52 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 }
 
                 if( $return === true ) return true;
-			}
+            }
 
-			return false;
-		}
+            return false;
+        }
 
 
-		/**
-		 * Add GetResponse checkbox to checkout page
+        /**
+         * Add GetResponse checkbox to checkout page
          *
          * @access      public
-         * @since		1.0.0
-		 * @return		void
-		 */
-		public function add_fields() {
-			ob_start();
+         * @since       1.0.0
+         * @return      void
+         */
+        public function add_fields() {
+            ob_start();
 
-			if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
-				echo '<fieldset id="edd_getresponse">';
-				echo '<label for="edd_getresponse_signup">';
-				echo '<input name="edd_getresponse_signup" id="edd_getresponse_signup" type="checkbox" checked="checked" />';
-				echo edd_get_option( 'edd_getresponse_label' ) ? edd_get_option( 'edd_getresponse_label' ) : __( 'Sign up for our mailing list', 'edd-getresponse' );
-			   	echo '</label>';
-				echo '</fieldset>';
-			}
+            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
+                echo '<fieldset id="edd_getresponse">';
+                echo '<label for="edd_getresponse_signup">';
+                echo '<input name="edd_getresponse_signup" id="edd_getresponse_signup" type="checkbox" checked="checked" />';
+                echo edd_get_option( 'edd_getresponse_label' ) ? edd_get_option( 'edd_getresponse_label' ) : __( 'Sign up for our mailing list', 'edd-getresponse' );
+                echo '</label>';
+                echo '</fieldset>';
+            }
 
-			echo ob_get_clean();
-		}
+            echo ob_get_clean();
+        }
 
 
-		/**
-		 * Checks whether a user should be added to list
+        /**
+         * Checks whether a user should be added to list
          *
          * @access      public
-		 * @since		1.0.0
-		 * @param		array $posted
-		 * @param		array $user_info The info for this user
-		 * @return		void
-		 */
-		function signup_check( $posted, $user_info ) {
-			if( isset( $posted['edd_getresponse_signup'] ) ) {
-				$email = $user_info['email'];
-				$name = $user_info['first_name'] . ' ' . $user_info['last_name'];
-				$this->subscribe_email( $email, $name );
-			}
-		}
-	}
+         * @since       1.0.0
+         * @param       array $posted
+         * @param       array $user_info The info for this user
+         * @return      void
+         */
+        function signup_check( $posted, $user_info ) {
+            if( isset( $posted['edd_getresponse_signup'] ) ) {
+                $email = $user_info['email'];
+                $name = $user_info['first_name'] . ' ' . $user_info['last_name'];
+                $this->subscribe_email( $email, $name );
+            }
+        }
+    }
 }
 
 
