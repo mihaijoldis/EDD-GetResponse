@@ -337,24 +337,14 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
  */
 function EDD_GetResponse_load() {
     if( !class_exists( 'Easy_Digital_Downloads' ) ) {
-        deactivate_plugins( __FILE__ );
-        unset( $_GET['activate'] );
+        if( !class_exists( 'S214_EDD_Activation' ) ) {
+            require_once( 'includes/class.s214-edd-activation.php' );
+        }
 
-        // Display notice
-        add_action( 'admin_notices', 'EDD_GetResponse_missing_edd_notice' );
+        $activation = new S214_EDD_Activation( plugin_dir_path( __FILE__ ), basename( __FILE__ ) );
+        $activation = $activation->run();
     } else {
         return EDD_GetResponse::instance();
     }
 }
 add_action( 'plugins_loaded', 'EDD_GetResponse_load' );
-
-
-/**
- * We need Easy Digital Downloads... if it isn't present, notify the user!
- *
- * @since       1.0.7
- * @return      void
- */
-function EDD_GetResponse_missing_edd_notice() {
-    echo '<div class="error"><p>' . __( 'GetResponse requires Easy Digital Downloads! Please install it to continue!', 'edd-getresponse' ) . '</p></div>';
-}
