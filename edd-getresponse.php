@@ -236,7 +236,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 try{
                     $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
 
-                    $return = $api->get_campaigns( $edd_options['edd_getresponse_api'] );
+                    $return = $api->get_campaigns( edd_get_option( 'edd_getresponse_api' ) );
                 } catch( Exception $e ) {
                     $return[] =  array( 'name' => __( 'Invalid API key or API timeout!', 'edd-getresponse' ) );
                 }
