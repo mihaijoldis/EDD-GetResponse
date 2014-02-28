@@ -189,6 +189,12 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                     'size'  => 'regular'
                 ),
                 array(
+                    'id'    => 'edd_getresponse_auto_subscribe',
+                    'name'  => '<strong>' . __( 'Enable Autosubscription', 'edd-getresponse' ),
+                    'desc'  => __( 'Removes the opt-in checkbox and automatically subscribes purchasers', 'edd-getresponse' ),
+                    'type'  => 'checkbox'
+                ),
+                array(
                     'id'    => 'edd_getresponse_label',
                     'name'  => __( 'Checkbox Label', 'edd-getresponse' ),
                     'desc'  => __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
@@ -273,7 +279,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 
                     $params = array( 'campaign' => edd_get_option( 'edd_getresponse_list', '' ), 'name' => $name, 'email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'], 'cycle_day' => 0 );
 
-                    $return = $api->add_contact( $edd_options['edd_getresponse_api'], $params );
+                    $return = $api->add_contact( edd_get_option( 'edd_getresponse_api' ), $params );
                 } catch( Exception $e ) {
                     $return = false;
                 }
@@ -296,12 +302,16 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             ob_start();
 
             if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
-                echo '<fieldset id="edd_getresponse">';
-                echo '<label for="edd_getresponse_signup">';
-                echo '<input name="edd_getresponse_signup" id="edd_getresponse_signup" type="checkbox" checked="checked" />';
-                echo edd_get_option( 'edd_getresponse_label' ) ? edd_get_option( 'edd_getresponse_label' ) : __( 'Sign up for our mailing list', 'edd-getresponse' );
-                echo '</label>';
-                echo '</fieldset>';
+                if( edd_get_option( 'edd_getresponse_auto_subscribe' ) ) {
+                    echo '<input name="edd_getresponse_signup" id="edd_getresponse_signup" type="hidden" value="true">';
+                } else {
+                    echo '<fieldset id="edd_getresponse">';
+                    echo '<label for="edd_getresponse_signup">';
+                    echo '<input name="edd_getresponse_signup" id="edd_getresponse_signup" type="checkbox" checked="checked" />';
+                    echo edd_get_option( 'edd_getresponse_label' ) ? edd_get_option( 'edd_getresponse_label' ) : __( 'Sign up for our mailing list', 'edd-getresponse' );
+                    echo '</label>';
+                    echo '</fieldset>';
+                }
             }
 
             echo ob_get_clean();
