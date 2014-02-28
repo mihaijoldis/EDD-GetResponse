@@ -3,7 +3,7 @@
  * Plugin Name:     Easy Digital Downloads - GetResponse
  * Plugin URI:      https://easydigitaldownloads.com/extension/getresponse/
  * Description:     Include a GetResponse signup option with your Easy Digital Downloads checkout
- * Version:         1.1.0
+ * Version:         1.1.1
  * Author:          Daniel J Griffiths
  * Author URI:      http://ghost1227.com
  * Text Domain:     edd-getresponse
@@ -46,6 +46,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             if( !self::$instance ) {
                 self::$instance = new EDD_GetResponse();
                 self::$instance->setup_constants();
+                self::$instance->includes();
                 self::$instance->load_textdomain();
                 self::$instance->hooks();
             }
@@ -77,6 +78,20 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 
 
         /**
+         * Include necessary files
+         *
+         * @access      private
+         * @since       1.1.1
+         * @return      void
+         */
+        private function includes() {
+            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
+                require_once EDD_GETRESPONSE_DIR . '/includes/metabox.php';
+            }
+        }
+
+
+        /**
          * Run action and filter hooks
          *
          * @access      private
@@ -99,7 +114,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             add_action( 'edd_purchase_form_after_cc_form', array( $this, 'add_fields' ), 999 );
 
             // Check if a user should be subscribed
-            add_action( 'edd_checkout_before_gateway', array( $this, 'signup_check' ), 10, 2 );
+            add_action( 'edd_checkout_before_gateway', array( $this, 'signup_check' ), 10, 3 );
         }
 
 
@@ -233,7 +248,9 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
 
                 // Get campaign list from GetResponse
-                $campaigns = array();
+                $campaigns = array(
+                    '' => __( 'None', 'edd-getresponse' )    
+                );
 
                 if( !class_exists( 'jsonRPCClient' ) ) {
                     require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
@@ -263,23 +280,57 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          *
          * @access      public
          * @since       1.0.0
-         * @param       string $email The email address to register
-         * @param       string $name The name of the user
+         * @param       array $user_info
          * @return      boolean True if the email can be subscribed, false otherwise
          */
-        public function subscribe_email( $email, $name ) {
+        public function subscribe_email( $user_info ) {
             if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
 
                 if( ! class_exists( 'jsonRPCClient' ) ) {
                     require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
                 }
 
+                $email      = $user_info['email'];
+                $name       = $user_info['first_name'] . ' ' . $user_info['last_name'];
+                $cart_items = edd_get_cart_contents();
+
                 try{
                     $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
 
-                    $params = array( 'campaign' => edd_get_option( 'edd_getresponse_list', '' ), 'name' => $name, 'email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'], 'cycle_day' => 0 );
+                    // Global newsletter
+                    if( edd_get_option( 'edd_getresponse_list', false ) ) {
+                        $params = array(
+                            'campaign' => edd_get_option( 'edd_getresponse_list', '' ),
+                            'name' => $name,
+                            'email' => $email,
+                            'ip' => $_SERVER['REMOTE_ADDR'],
+                            'cycle_day' => 0
+                        );
 
-                    $return = $api->add_contact( edd_get_option( 'edd_getresponse_api' ), $params );
+                        $return = $api->add_contact( edd_get_option( 'edd_getresponse_api' ), $params );
+                    }
+
+                    // Per-product newsletters
+                    if( !empty( $cart_items ) ) {
+                        foreach( $cart_items as $cart_item ) {
+
+                            $campaign = get_post_meta( $cart_item['id'], '_edd_getresponse_campaign', true ) ? get_post_meta( $cart_item['id'], '_edd_getresponse_campaign', true ) : null;
+
+                            if( !$campaign )
+                                continue;
+
+                            $params = array(
+                                'campaign' => $campaign,
+                                'name' => $name,
+                                'email' => $email,
+                                'ip' => $_SERVER['REMOTE_ADDR'],
+                                'cycle_day' => 0
+                            );
+
+                            $return = $api->add_contact( edd_get_option( 'edd_getresponse_api' ), $params );
+                        }
+                    }
+
                 } catch( Exception $e ) {
                     $return = false;
                 }
@@ -327,11 +378,9 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          * @param       array $user_info The info for this user
          * @return      void
          */
-        function signup_check( $posted, $user_info ) {
+        function signup_check( $posted, $user_info, $valid_data ) {
             if( isset( $posted['edd_getresponse_signup'] ) ) {
-                $email = $user_info['email'];
-                $name = $user_info['first_name'] . ' ' . $user_info['last_name'];
-                $this->subscribe_email( $email, $name );
+                $this->subscribe_email( $user_info );
             }
         }
     }
