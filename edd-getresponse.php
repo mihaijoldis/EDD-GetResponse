@@ -219,7 +219,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 ),
             );
 
-            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
+            if( edd_get_option( 'edd_getresponse_api', false ) ) {
                 $edd_getresponse_settings_2 = array(
                     array(
                         'id'    => 'edd_getresponse_list',
@@ -245,7 +245,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
         public function get_campaigns() {
 
             // Make sure we have an API key in the database
-            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
+            if( edd_get_option( 'edd_getresponse_api', false ) ) {
 
                 // Get campaign list from GetResponse
                 $campaigns = array(
