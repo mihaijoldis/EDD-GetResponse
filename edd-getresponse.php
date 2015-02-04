@@ -3,7 +3,7 @@
  * Plugin Name:     Easy Digital Downloads - GetResponse
  * Plugin URI:      https://easydigitaldownloads.com/extension/getresponse/
  * Description:     Include a GetResponse signup option with your Easy Digital Downloads checkout
- * Version:         1.1.1
+ * Version:         1.1.2
  * Author:          Daniel J Griffiths
  * Author URI:      http://ghost1227.com
  * Text Domain:     edd-getresponse
@@ -64,7 +64,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          */
         public function setup_constants() {
             // Plugin version
-            define( 'EDD_GETRESPONSE_VERSION', '1.1.0' );
+            define( 'EDD_GETRESPONSE_VERSION', '1.1.2' );
 
             // Plugin path
             define( 'EDD_GETRESPONSE_DIR', plugin_dir_path( __FILE__ ) );
@@ -109,6 +109,9 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             if( class_exists( 'EDD_License' ) ) {
                 $license = new EDD_License( __FILE__, 'GetResponse', EDD_GETRESPONSE_VERSION, 'Daniel J Griffiths' );
             }
+
+            // Maybe display error
+            add_action( 'edd_getresponse_error', array( $this, 'settings_error' ) );
 
             // Add GetResponse checkbox to checkout page
             add_action( 'edd_purchase_form_after_cc_form', array( $this, 'add_fields' ), 999 );
@@ -186,9 +189,6 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          * @return      array The modified plugin settings
          */
         public function settings( $settings ) {
-            // Just in case the API key isn't set yet
-            $edd_getresponse_settings_2 = array();
-
             $edd_getresponse_settings = array(
                 array(
                     'id'    => 'edd_getresponse_settings',
@@ -219,19 +219,42 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 ),
             );
 
-            if( edd_get_option( 'edd_getresponse_api', false ) ) {
-                $edd_getresponse_settings_2 = array(
+            $campaigns = $this->get_campaigns();
+
+            if( isset( $campaigns[0] ) && $campaigns[0] == __( 'Invalid API key or API timeout!', 'edd-getresponse' ) ) {
+                $edd_getresponse_settings2 = array(
+                    array(
+                        'id'    => 'getresponse_error',
+                        'name'  => __( 'Choose a Campaign', 'edd-getresponse' ),
+                        'desc'  => '',
+                        'type'  => 'hook'
+                    )
+                );
+            } else {
+                $edd_getresponse_settings2 = array(
                     array(
                         'id'    => 'edd_getresponse_list',
                         'name'  => __( 'Choose a Campaign', 'edd-getresponse' ),
                         'desc'  => __( 'Select the campaign you wish to subscribe buyers to', 'edd-getresponse' ),
                         'type'  => 'select',
-                        'options'   => $this->get_campaigns()
-                    ),
+                        'options'   => $campaigns
+                    )
                 );
             }
             
-            return array_merge( $settings, array_merge( $edd_getresponse_settings, $edd_getresponse_settings_2 ) );
+            return array_merge( $settings, array_merge( $edd_getresponse_settings, $edd_getresponse_settings2 ) );
+        }
+
+
+        /**
+         * Error to display on invalid API key
+         *
+         * @access      public
+         * @since       1.1.2
+         * @return      void
+         */
+        public function settings_error() {
+            echo __( 'Invalid API key or API timeout!', 'edd-getresponse' );
         }
 
 
@@ -246,18 +269,17 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 
             // Make sure we have an API key in the database
             if( edd_get_option( 'edd_getresponse_api', false ) ) {
-
-                // Get campaign list from GetResponse
-                $campaigns = array(
-                    '' => __( 'None', 'edd-getresponse' )    
-                );
-
                 if( !class_exists( 'jsonRPCClient' ) ) {
                     require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
                 }
 
                 try{
                     $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
+
+                    // Get campaign list from GetResponse
+                    $campaigns = array(
+                        '' => __( 'None', 'edd-getresponse' )    
+                    );
 
                     $return = $api->get_campaigns( edd_get_option( 'edd_getresponse_api' ) );
                 } catch( Exception $e ) {
