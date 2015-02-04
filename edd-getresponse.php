@@ -269,7 +269,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          */
         public function get_campaigns() {
             // Check for an existing transient
-            if( get_transient( 'edd_getresponse_campaigns' ) === false ) {
+            if( ( $transient = get_transient( 'edd_getresponse_campaigns' ) ) === false ) {
                 $campaigns['error'] = __( 'Please enter an API key!', 'edd-getresponse' );
 
                 // Make sure we have an API key in the database
@@ -295,8 +295,12 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                         foreach( $return as $campaign_id => $campaign_info ) {
                             $campaigns[$campaign_id] = $campaign_info['name'];
                         }
+
+                        set_transient( 'edd_getresponse_campaigns', $campaigns, 24*24*24 );
                     }
                 }
+            } else {
+                $campaigns = $transient;
             }
 
             return $campaigns;
