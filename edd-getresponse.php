@@ -221,7 +221,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 
             $campaigns = $this->get_campaigns();
 
-            if( isset( $campaigns[0] ) && $campaigns[0] == __( 'Invalid API key or API timeout!', 'edd-getresponse' ) ) {
+            if( isset( $campaigns['error'] ) ) {
                 $edd_getresponse_settings2 = array(
                     array(
                         'id'    => 'getresponse_error',
@@ -254,7 +254,9 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          * @return      void
          */
         public function settings_error() {
-            echo __( 'Invalid API key or API timeout!', 'edd-getresponse' );
+            $error = $this->get_campaigns();
+
+            echo $error['error'];
         }
 
 
@@ -266,34 +268,38 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          * @return      array The list of available campaigns
          */
         public function get_campaigns() {
+            // Check for an existing transient
+            if( get_transient( 'edd_getresponse_campaigns' ) === false ) {
+                $campaigns['error'] = __( 'Please enter an API key!', 'edd-getresponse' );
 
-            // Make sure we have an API key in the database
-            if( edd_get_option( 'edd_getresponse_api', false ) ) {
-                if( !class_exists( 'jsonRPCClient' ) ) {
-                    require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
+                // Make sure we have an API key in the database
+                if( edd_get_option( 'edd_getresponse_api', false ) ) {
+                    if( !class_exists( 'jsonRPCClient' ) ) {
+                        require_once EDD_GETRESPONSE_DIR . 'includes/libraries/jsonRPCClient.php';
+                    }
+
+                    try{
+                        $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
+
+                        // Get campaign list from GetResponse
+                        $campaigns = array(
+                            '' => __( 'None', 'edd-getresponse' )    
+                        );
+
+                        $return = $api->get_campaigns( edd_get_option( 'edd_getresponse_api' ) );
+                    } catch( Exception $e ) {
+                        $campaigns['error'] = __( 'Invalid API key or API timeout!', 'edd-getresponse' );
+                    }
+
+                    if( ! array_key_exists( 'error', $campaigns ) ) {
+                        foreach( $return as $campaign_id => $campaign_info ) {
+                            $campaigns[$campaign_id] = $campaign_info['name'];
+                        }
+                    }
                 }
-
-                try{
-                    $api = new jsonRPCClient( EDD_GETRESPONSE_API_URL );
-
-                    // Get campaign list from GetResponse
-                    $campaigns = array(
-                        '' => __( 'None', 'edd-getresponse' )    
-                    );
-
-                    $return = $api->get_campaigns( edd_get_option( 'edd_getresponse_api' ) );
-                } catch( Exception $e ) {
-                    $return[] =  array( 'name' => __( 'Invalid API key or API timeout!', 'edd-getresponse' ) );
-                }
-
-                foreach( $return as $campaign_id => $campaign_info ) {
-                    $campaigns[$campaign_id] = $campaign_info['name'];
-                }
-
-                return $campaigns;
             }
 
-            return array();
+            return $campaigns;
         }
 
 
