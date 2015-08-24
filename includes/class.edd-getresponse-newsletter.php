@@ -17,6 +17,12 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 
 
     /**
+     * Display errors?
+     */
+    public $api_error = false;
+
+
+    /**
      * Set up the checkout label
      *
      * @access      public
@@ -28,6 +34,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
         $this->checkout_label = trim( $label );
 
         add_filter( 'edd_settings_extensions_sanitize', array( $this, 'save_settings' ) );
+        add_action( 'admin_notices', array( $this, 'display_api_errors' ) );
     }
 
 
@@ -53,6 +60,10 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
                 foreach( $list_data as $key => $list ) {
                     $this->lists[$list->campaignId] = $list->name;
                 }
+
+                $this->api_error = false;
+            } else {
+                $this->api_error = $list_data->message;
             }
         }
 
@@ -241,4 +252,22 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 
         return $response;
     }
+
+
+    /**
+     * Display API errors
+     *
+     * @access      public
+     * @since       2.0.0
+     * @return      void
+     */
+    public function display_api_errors() {
+        if( $this->api_error ) {
+            $error  = '<div class="error settings-error notice">';
+            $error .= '<p>' . sprintf( __( '<strong>GetResponse API returned the following error:</strong> %s', 'edd-getresponse' ), $this->api_error ) . '</p>';
+            $error .= '</div>';
+
+            echo $error;
+        }
+    }    
 }
