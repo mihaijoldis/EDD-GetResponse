@@ -73,7 +73,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             define( 'EDD_GETRESPONSE_URL', plugin_dir_url( __FILE__ ) );
 
             // GetResponse API URL
-            define( 'EDD_GETRESPONSE_API_URL', 'http://api2.getresponse.com' );
+            define( 'EDD_GETRESPONSE_API_URL', 'http://api.getresponse.com/v3' );
         }
 
 
@@ -85,7 +85,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          * @return      void
          */
         private function includes() {
-            if( edd_get_option( 'edd_getresponse_api' ) && strlen( trim( edd_get_option( 'edd_getresponse_api' ) ) > 0 ) ) {
+            if( edd_get_option( 'edd_getresponse_api', false ) ) {
                 require_once EDD_GETRESPONSE_DIR . '/includes/metabox.php';
             }
         }
@@ -99,9 +99,6 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          * @return      void
          */
         private function hooks() {
-            // Edit plugin metadata
-            add_filter( 'plugin_row_meta', array( $this, 'plugin_metalinks' ), null, 2 );
-
             // Register settings
             add_filter( 'edd_settings_extensions', array( $this, 'settings' ), 1 );
 
@@ -151,32 +148,6 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
                 // Load the default language files
                 load_plugin_textdomain( 'edd-getresponse', false, $lang_dir );
             }
-        }
-
-
-        /**
-         * Modify plugin metalinks
-         *
-         * @access      public
-         * @since       1.0.7
-         * @param       array $links The current links array
-         * @param       string $file A specific plugin table entry
-         * @return      array $links The modified links array
-         */
-        public function plugin_metalinks( $links, $file ) {
-            if( $file == plugin_basename( __FILE__ ) ) {
-                $help_link = array( 
-                    '<a href="https://easydigitaldownloads.com/support/forum/add-on-plugins/getresponse/" target="_blank">' . __( 'Support Forum', 'edd-getresponse' ) . '</a>'
-                );
-
-                $docs_link = array(
-                    '<a href="http://section214.com/docs/category/edd-getresponse/" target="_blank">' . __( 'Docs', 'edd-getresponse' ) . '</a>'
-                );
-
-                $links = array_merge( $links, $help_link, $docs_link );
-            }
-
-            return $links;
         }
 
 
@@ -427,9 +398,9 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
  * @return      \EDD_GetResponse The one true EDD_GetResponse
  */
 function EDD_GetResponse_load() {
-    if( !class_exists( 'Easy_Digital_Downloads' ) ) {
-        if( !class_exists( 'S214_EDD_Activation' ) ) {
-            require_once( 'includes/class.s214-edd-activation.php' );
+    if( ! class_exists( 'Easy_Digital_Downloads' ) ) {
+        if( ! class_exists( 'S214_EDD_Activation' ) ) {
+            require_once( 'includes/libraries/class.s214-edd-activation.php' );
         }
 
         $activation = new S214_EDD_Activation( plugin_dir_path( __FILE__ ), basename( __FILE__ ) );
