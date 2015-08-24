@@ -49,7 +49,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
                 set_transient( 'edd_getresponse_list_data', $list_data, 24*24*24 );
             }
 
-            if( ! empty( $list_data ) ) {
+            if( is_array( $list_data ) ) {
                 foreach( $list_data as $key => $list ) {
                     $this->lists[$list->campaignId] = $list->name;
                 }
