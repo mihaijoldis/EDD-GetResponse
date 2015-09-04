@@ -17,6 +17,8 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+// Plugin version
+define( 'EDD_GETRESPONSE_VERSION', '2.0.0' );
 
 if( !class_exists( 'EDD_GetResponse' ) ) {
 
@@ -71,9 +73,6 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
          * @return      void
          */
         public function setup_constants() {
-            // Plugin version
-            define( 'EDD_GETRESPONSE_VERSION', '2.0.0' );
-
             // Plugin path
             define( 'EDD_GETRESPONSE_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -98,6 +97,10 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
             }
 
             require_once EDD_GETRESPONSE_DIR . '/includes/class.edd-getresponse-newsletter.php';
+
+            if( is_admin() ) {
+                require_once EDD_GETRESPONSE_DIR . '/includes/upgrades.php';
+            }
         }
 
 
