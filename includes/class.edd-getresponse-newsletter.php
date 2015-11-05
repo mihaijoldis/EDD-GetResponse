@@ -48,7 +48,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
     public function get_lists() {
         if( edd_get_option( 'edd_getresponse_api', false ) ) {
             $list_data = get_transient( 'edd_getresponse_list_data' );
-            
+
             if( $list_data === false ) {
                 // Get lists
                 $list_data = $this->call_api( 'get', 'campaigns' );
@@ -119,7 +119,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
                 'desc'  => __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
                 'type'  => 'text',
                 'size'  => 'regular',
-                'std'   => __( 'Sign up for our mailing list', 'edd-getresponse' ) 
+                'std'   => __( 'Sign up for our mailing list', 'edd-getresponse' )
             )
         );
 
@@ -181,9 +181,12 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
             $query = '[email]=' . $user_info['email'];
             $result = $this->call_api( 'get', 'contacts', $query );
 
+            $name = $user_info['first_name'] . ' ' . $user_info['last_name'];
+            $name = ( $name == ' ' ) ? $user_info['email'] : $name;
+
             if( empty( $result ) ) {
                 $contact = array(
-                    'name'      => $user_info['first_name'] . ' ' . $user_info['last_name'],
+                    'name'      => $name,
                     'email'     => $user_info['email'],
                     'optin'     => edd_get_option( 'edd_getresponse_double_optin', false ) ? 'double' : 'single',
                     'campaign'  => array(
@@ -269,5 +272,5 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 
             echo $error;
         }
-    }    
+    }
 }
