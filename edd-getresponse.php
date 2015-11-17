@@ -23,134 +23,134 @@ define( 'EDD_GETRESPONSE_VERSION', '2.0.0' );
 if( !class_exists( 'EDD_GetResponse' ) ) {
 
 
-    /**
-     * Main EDD_GetResponse class
-     *
-     * @since       1.0.3
-     */
-    class EDD_GetResponse {
+	/**
+	 * Main EDD_GetResponse class
+	 *
+	 * @since       1.0.3
+	 */
+	class EDD_GetResponse {
 
-        /**
-         * @var         EDD_GetResponse $instance The one true EDD_GetResponse
-         * @since       1.0.3
-         */
-        private static $instance;
-
-
-        /**
-         * @var         EDD_GetResponse_Newsletter $newsletter The newsletter instance
-         * @since       2.0.0
-         */
-        public $newsletter;
+		/**
+		 * @var         EDD_GetResponse $instance The one true EDD_GetResponse
+		 * @since       1.0.3
+		 */
+		private static $instance;
 
 
-        /**
-         * Get active instance
-         *
-         * @access      public
-         * @since       1.0.3
-         * @return      object self::$instance The one true EDD_GetResponse
-         */
-        public static function instance() {
-            if( !self::$instance ) {
-                self::$instance = new EDD_GetResponse();
-                self::$instance->setup_constants();
-                self::$instance->includes();
-                self::$instance->load_textdomain();
-                self::$instance->hooks();
-                self::$instance->newsletter = new EDD_GetResponse_Newsletter( 'getresponse', 'GetResponse' );
-            }
-
-            return self::$instance;
-        }
+		/**
+		 * @var         EDD_GetResponse_Newsletter $newsletter The newsletter instance
+		 * @since       2.0.0
+		 */
+		public $newsletter;
 
 
-        /**
-         * Setup plugin constants
-         *
-         * @access      private
-         * @since       1.0.7
-         * @return      void
-         */
-        public function setup_constants() {
-            // Plugin path
-            define( 'EDD_GETRESPONSE_DIR', plugin_dir_path( __FILE__ ) );
+		/**
+		 * Get active instance
+		 *
+		 * @access      public
+		 * @since       1.0.3
+		 * @return      object self::$instance The one true EDD_GetResponse
+		 */
+		public static function instance() {
+			if( !self::$instance ) {
+				self::$instance = new EDD_GetResponse();
+				self::$instance->setup_constants();
+				self::$instance->includes();
+				self::$instance->load_textdomain();
+				self::$instance->hooks();
+				self::$instance->newsletter = new EDD_GetResponse_Newsletter( 'getresponse', 'GetResponse' );
+			}
 
-            // Plugin URL
-            define( 'EDD_GETRESPONSE_URL', plugin_dir_url( __FILE__ ) );
-
-            // GetResponse API URL
-            define( 'EDD_GETRESPONSE_API_URL', 'http://api.getresponse.com/v3' );
-        }
-
-
-        /**
-         * Include necessary files
-         *
-         * @access      private
-         * @since       1.1.1
-         * @return      void
-         */
-        private function includes() {
-            if( ! class_exists( 'EDD_Newsletter' ) ) {
-                require_once EDD_GETRESPONSE_DIR . '/includes/class.edd-newsletter.php';
-            }
-
-            require_once EDD_GETRESPONSE_DIR . '/includes/class.edd-getresponse-newsletter.php';
-
-            if( is_admin() ) {
-                require_once EDD_GETRESPONSE_DIR . '/includes/upgrades.php';
-            }
-        }
+			return self::$instance;
+		}
 
 
-        /**
-         * Run action and filter hooks
-         *
-         * @access      private
-         * @since       1.0.3
-         * @return      void
-         */
-        private function hooks() {
-            // Handle licensing
-            if( class_exists( 'EDD_License' ) ) {
-                $license = new EDD_License( __FILE__, 'GetResponse', EDD_GETRESPONSE_VERSION, 'Daniel J Griffiths' );
-            }
-        }
+		/**
+		 * Setup plugin constants
+		 *
+		 * @access      private
+		 * @since       1.0.7
+		 * @return      void
+		 */
+		public function setup_constants() {
+			// Plugin path
+			define( 'EDD_GETRESPONSE_DIR', plugin_dir_path( __FILE__ ) );
+
+			// Plugin URL
+			define( 'EDD_GETRESPONSE_URL', plugin_dir_url( __FILE__ ) );
+
+			// GetResponse API URL
+			define( 'EDD_GETRESPONSE_API_URL', 'http://api.getresponse.com/v3' );
+		}
 
 
-        /**
-         * Internationalization
-         *
-         * @access      public
-         * @since       1.0.3
-         * @return      void
-         */
-        public static function load_textdomain() {
-            // Set filter for languages directory
-            $lang_dir = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
-            $lang_dir = apply_filters( 'edd_getresponse_languages_directory', $lang_dir );
+		/**
+		 * Include necessary files
+		 *
+		 * @access      private
+		 * @since       1.1.1
+		 * @return      void
+		 */
+		private function includes() {
+			if( ! class_exists( 'EDD_Newsletter' ) ) {
+				require_once EDD_GETRESPONSE_DIR . '/includes/class.edd-newsletter.php';
+			}
 
-            // Traditional WordPress plugin locale filter
-            $locale     = apply_filters( 'plugin_locale', get_locale(), 'edd-getresponse' );
-            $mofile     = sprintf( '%1$s-%2$s.mo', 'edd-getresponse', $locale );
+			require_once EDD_GETRESPONSE_DIR . '/includes/class.edd-getresponse-newsletter.php';
 
-            // Setup paths to current locale file
-            $mofile_local   = $lang_dir . $mofile;
-            $mofile_global  = WP_LANG_DIR . '/edd-getresponse/' . $mofile;
+			if( is_admin() ) {
+				require_once EDD_GETRESPONSE_DIR . '/includes/upgrades.php';
+			}
+		}
 
-            if( file_exists( $mofile_global ) ) {
-                // Look in global /wp-content/languages/edd-getresponse/ folder
-                load_textdomain( 'edd-getresponse', $mofile_global );
-            } elseif( file_exists( $mofile_local ) ) {
-                // Look in local /wp-content/plugins/edd-getresponse/languages/ folder
-                load_textdomain( 'edd-getresponse', $mofile_local );
-            } else {
-                // Load the default language files
-                load_plugin_textdomain( 'edd-getresponse', false, $lang_dir );
-            }
-        }
-    }
+
+		/**
+		 * Run action and filter hooks
+		 *
+		 * @access      private
+		 * @since       1.0.3
+		 * @return      void
+		 */
+		private function hooks() {
+			// Handle licensing
+			if( class_exists( 'EDD_License' ) ) {
+				$license = new EDD_License( __FILE__, 'GetResponse', EDD_GETRESPONSE_VERSION, 'Daniel J Griffiths' );
+			}
+		}
+
+
+		/**
+		 * Internationalization
+		 *
+		 * @access      public
+		 * @since       1.0.3
+		 * @return      void
+		 */
+		public static function load_textdomain() {
+			// Set filter for languages directory
+			$lang_dir = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
+			$lang_dir = apply_filters( 'edd_getresponse_languages_directory', $lang_dir );
+
+			// Traditional WordPress plugin locale filter
+			$locale = apply_filters( 'plugin_locale', get_locale(), 'edd-getresponse' );
+			$mofile = sprintf( '%1$s-%2$s.mo', 'edd-getresponse', $locale );
+
+			// Setup paths to current locale file
+			$mofile_local  = $lang_dir . $mofile;
+			$mofile_global = WP_LANG_DIR . '/edd-getresponse/' . $mofile;
+
+			if( file_exists( $mofile_global ) ) {
+				// Look in global /wp-content/languages/edd-getresponse/ folder
+				load_textdomain( 'edd-getresponse', $mofile_global );
+			} elseif( file_exists( $mofile_local ) ) {
+				// Look in local /wp-content/plugins/edd-getresponse/languages/ folder
+				load_textdomain( 'edd-getresponse', $mofile_local );
+			} else {
+				// Load the default language files
+				load_plugin_textdomain( 'edd-getresponse', false, $lang_dir );
+			}
+		}
+	}
 }
 
 
@@ -162,15 +162,15 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
  * @return      \EDD_GetResponse The one true EDD_GetResponse
  */
 function EDD_GetResponse_load() {
-    if( ! class_exists( 'Easy_Digital_Downloads' ) ) {
-        if( ! class_exists( 'S214_EDD_Activation' ) ) {
-            require_once( 'includes/libraries/class.s214-edd-activation.php' );
-        }
+	if( ! class_exists( 'Easy_Digital_Downloads' ) ) {
+		if( ! class_exists( 'S214_EDD_Activation' ) ) {
+			require_once( 'includes/libraries/class.s214-edd-activation.php' );
+		}
 
-        $activation = new S214_EDD_Activation( plugin_dir_path( __FILE__ ), basename( __FILE__ ) );
-        $activation = $activation->run();
-    } else {
-        return EDD_GetResponse::instance();
-    }
+		$activation = new S214_EDD_Activation( plugin_dir_path( __FILE__ ), basename( __FILE__ ) );
+		$activation = $activation->run();
+	} else {
+		return EDD_GetResponse::instance();
+	}
 }
 add_action( 'plugins_loaded', 'EDD_GetResponse_load' );
