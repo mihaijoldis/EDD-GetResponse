@@ -15,7 +15,9 @@
 
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // Plugin version
 define( 'EDD_GETRESPONSE_VERSION', '2.0.0' );
