@@ -186,13 +186,14 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 
             if( empty( $result ) ) {
                 $contact = array(
-                    'name'      => $name,
-                    'email'     => $user_info['email'],
-                    'optin'     => edd_get_option( 'edd_getresponse_double_optin', false ) ? 'double' : 'single',
-                    'campaign'  => array(
+                    'name'       => $name,
+                    'email'      => $user_info['email'],
+                    'dayOfCycle' => 0,
+                    'optin'      => edd_get_option( 'edd_getresponse_double_optin', false ) ? 'double' : 'single',
+                    'campaign'   => array(
                         'campaignId'    => $list_id
                     ),
-                    'ipAddress' => edd_get_ip()
+                    'ipAddress'  => edd_get_ip()
                 );
 
                 $result = $this->call_api( 'post', 'contacts', $contact );
