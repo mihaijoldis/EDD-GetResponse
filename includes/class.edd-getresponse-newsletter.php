@@ -19,7 +19,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	/**
 	 * Display errors?
 	 */
-	public $api_error = false;
+	public $api_error = true;
 
 
 	/**
@@ -34,6 +34,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 		$this->checkout_label = trim( $label );
 
 		add_filter( 'edd_settings_extensions_sanitize', array( $this, 'save_settings' ) );
+		add_filter( 'edd_settings_extensions-getresponse_sanitize', array( $this, 'save_settings' ) );
 		add_action( 'admin_notices', array( $this, 'display_api_errors' ) );
 	}
 
@@ -80,7 +81,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	 * @return      array $input The saved settings
 	 */
 	public function save_settings( $input ) {
-		if( isset( $input['edd_getresponse_api'] ) ) {
+		if( isset( $input['edd_getresponse_api'] ) !== edd_get_option( 'edd_getresponse_api', false ) ) {
 			delete_transient( 'edd_getresponse_list_data' );
 		}
 
