@@ -19,7 +19,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	/**
 	 * Display errors?
 	 */
-	public $api_error = false;
+	public $api_error = true;
 
 
 	/**
@@ -34,6 +34,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 		$this->checkout_label = trim( $label );
 
 		add_filter( 'edd_settings_extensions_sanitize', array( $this, 'save_settings' ) );
+		add_filter( 'edd_settings_extensions-getresponse_sanitize', array( $this, 'save_settings' ) );
 		add_action( 'admin_notices', array( $this, 'display_api_errors' ) );
 	}
 
@@ -72,62 +73,6 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 
 
 	/**
-	 * Register plugin settings
-	 *
-	 * @access      public
-	 * @since       1.0.0
-	 * @param       array $settings The existing settings
-	 * @return      array The updated settings
-	 */
-	public function settings( $settings ) {
-		$new_settings = array(
-			array(
-				'id'   => 'edd_getresponse_settings',
-				'name' => '<strong>' . __( 'GetResponse Settings', 'edd-getresponse' ) . '</strong>',
-				'desc' => __( 'Configure GetResponse Integrations Settings', 'edd-getresponse' ),
-				'type' => 'header'
-			),
-			array(
-				'id'   => 'edd_getresponse_api',
-				'name' => __( 'GetResponse API Key', 'edd-getresponse' ),
-				'desc' => __( 'Enter your GetResponse API key', 'edd-getresponse' ),
-				'type' => 'text',
-				'size' => 'regular'
-			),
-			array(
-				'id'      => 'edd_getresponse_list',
-				'name'    => __( 'Choose A Campaign', 'edd-getresponse' ),
-				'desc'    => __( 'Select the campaign you wish to subscribe buyers to', 'edd-getresponse' ),
-				'type'    => 'select',
-				'options' => $this->get_lists()
-			),
-			array(
-				'id'   => 'edd_getresponse_checkout_signup',
-				'name' => __( 'Show Signup Checkbox', 'edd-getresponse' ),
-				'desc' => __( 'Allow customers to signup for the list selected above during checkout', 'edd-getresponse' ),
-				'type' => 'checkbox'
-			),
-			array(
-				'id'   => 'edd_getresponse_double_optin',
-				'name' => __( 'Double Opt-In', 'edd-getresponse' ),
-				'desc' => __( 'When checked, users will be sent a confirmation email after signing up', 'edd-getresponse' ),
-				'type' => 'checkbox'
-			),
-			array(
-				'id'   => 'edd_getresponse_label',
-				'name' => __( 'Checkbox Label', 'edd-getresponse' ),
-				'desc' => __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
-				'type' => 'text',
-				'size' => 'regular',
-				'std'  => __( 'Sign up for our mailing list', 'edd-getresponse' )
-			)
-		);
-
-		return array_merge( $settings, $new_settings );
-	}
-
-
-	/**
 	 * Flush the list transient on save
 	 *
 	 * @access      public
@@ -136,7 +81,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	 * @return      array $input The saved settings
 	 */
 	public function save_settings( $input ) {
-		if( isset( $input['edd_getresponse_api'] ) ) {
+		if( isset( $input['edd_getresponse_api'] ) !== edd_get_option( 'edd_getresponse_api', false ) ) {
 			delete_transient( 'edd_getresponse_list_data' );
 		}
 
@@ -189,7 +134,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 					'name'       => $name,
 					'email'      => $user_info['email'],
 					'dayOfCycle' => 0,
-					'optin'      => edd_get_option( 'edd_getresponse_double_optin', false ) ? 'double' : 'single',
+					//'optin'      => edd_get_option( 'edd_getresponse_double_optin', false ) ? 'double' : 'single',
 					'campaign'   => array(
 						'campaignId' => $list_id
 					),

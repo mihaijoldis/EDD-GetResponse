@@ -3,7 +3,7 @@
  * Plugin Name:     Easy Digital Downloads - GetResponse
  * Plugin URI:      https://easydigitaldownloads.com/extension/getresponse/
  * Description:     Include a GetResponse signup option with your Easy Digital Downloads checkout
- * Version:         2.0.1
+ * Version:         2.1.0
  * Author:          Daniel J Griffiths
  * Author URI:      http://ghost1227.com
  * Text Domain:     edd-getresponse
@@ -19,10 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Plugin version
-define( 'EDD_GETRESPONSE_VERSION', '2.0.1' );
 
-if( !class_exists( 'EDD_GetResponse' ) ) {
+// Plugin version
+define( 'EDD_GETRESPONSE_VERSION', '2.1.0' );
+
+
+if( ! class_exists( 'EDD_GetResponse' ) ) {
 
 
 	/**
@@ -54,7 +56,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 		 * @return      object self::$instance The one true EDD_GetResponse
 		 */
 		public static function instance() {
-			if( !self::$instance ) {
+			if( ! self::$instance ) {
 				self::$instance = new EDD_GetResponse();
 				self::$instance->setup_constants();
 				self::$instance->includes();
@@ -82,7 +84,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 			define( 'EDD_GETRESPONSE_URL', plugin_dir_url( __FILE__ ) );
 
 			// GetResponse API URL
-			define( 'EDD_GETRESPONSE_API_URL', 'http://api.getresponse.com/v3' );
+			define( 'EDD_GETRESPONSE_API_URL', 'https://api.getresponse.com/v3' );
 		}
 
 
@@ -101,6 +103,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
 			require_once EDD_GETRESPONSE_DIR . '/includes/class.edd-getresponse-newsletter.php';
 
 			if( is_admin() ) {
+				require_once EDD_GETRESPONSE_DIR . 'includes/admin/settings/register.php';
 				require_once EDD_GETRESPONSE_DIR . '/includes/upgrades.php';
 			}
 		}
@@ -163,7 +166,7 @@ if( !class_exists( 'EDD_GetResponse' ) ) {
  * @since       1.0.3
  * @return      \EDD_GetResponse The one true EDD_GetResponse
  */
-function EDD_GetResponse_load() {
+function edd_getresponse() {
 	if( ! class_exists( 'Easy_Digital_Downloads' ) ) {
 		if( ! class_exists( 'S214_EDD_Activation' ) ) {
 			require_once( 'includes/libraries/class.s214-edd-activation.php' );
@@ -175,4 +178,4 @@ function EDD_GetResponse_load() {
 		return EDD_GetResponse::instance();
 	}
 }
-add_action( 'plugins_loaded', 'EDD_GetResponse_load' );
+add_action( 'plugins_loaded', 'edd_getresponse' );
