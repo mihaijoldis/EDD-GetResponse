@@ -39,46 +39,59 @@ function edd_getresponse_add_settings( $settings ) {
 	if( EDD_VERSION >= '2.5' ) {
 		$new_settings = array(
 			'getresponse' => array(
-			array(
-				'id'   => 'edd_getresponse_api_config',
-				'name' => '<strong>' . __( 'API Configuration', 'edd-getresponse' ) . '</strong>',
-				'desc' => '',
-				'type' => 'header'
-			),
-			array(
-				'id'   => 'edd_getresponse_api',
-				'name' => __( 'GetResponse API Key', 'edd-getresponse' ),
-				'desc' => __( 'Enter your GetResponse API key', 'edd-getresponse' ),
-				'type' => 'text',
-				'size' => 'regular'
-			),
-			array(
-				'id'      => 'edd_getresponse_list',
-				'name'    => __( 'Choose A Campaign', 'edd-getresponse' ),
-				'desc'    => __( 'Select the campaign you wish to subscribe buyers to', 'edd-getresponse' ),
-				'type'    => 'select',
-				'options' => edd_getresponse()->newsletter->get_lists()
-			),
-			array(
-				'id'   => 'edd_getresponse_signup_config',
-				'name' => '<strong>' . __( 'Signup Configuration', 'edd-getresponse' ) . '</strong>',
-				'desc' => '',
-				'type' => 'header'
-			),
-			array(
-				'id'   => 'edd_getresponse_checkout_signup',
-				'name' => __( 'Show Signup Checkbox', 'edd-getresponse' ),
-				'desc' => __( 'Allow customers to signup for the list selected above during checkout', 'edd-getresponse' ),
-				'type' => 'checkbox'
-			),
-			array(
-				'id'   => 'edd_getresponse_label',
-				'name' => __( 'Checkbox Label', 'edd-getresponse' ),
-				'desc' => __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
-				'type' => 'text',
-				'size' => 'regular',
-				'std'  => __( 'Sign up for our mailing list', 'edd-getresponse' )
-			))
+				array(
+					'id'   => 'edd_getresponse_api_config',
+					'name' => '<strong>' . __( 'API Configuration', 'edd-getresponse' ) . '</strong>',
+					'desc' => '',
+					'type' => 'header'
+				),
+				array(
+					'id'   => 'edd_getresponse_api',
+					'name' => __( 'GetResponse API Key', 'edd-getresponse' ),
+					'desc' => __( 'Enter your GetResponse API key', 'edd-getresponse' ),
+					'type' => 'text',
+					'size' => 'regular'
+				),
+				array(
+					'id'      => 'edd_getresponse_list',
+					'name'    => __( 'Choose A Campaign', 'edd-getresponse' ),
+					'desc'    => __( 'Select the campaign you wish to subscribe buyers to', 'edd-getresponse' ),
+					'type'    => 'select',
+					'options' => edd_getresponse()->newsletter->get_lists()
+				),
+				array(
+					'id'   => 'edd_getresponse_signup_config',
+					'name' => '<strong>' . __( 'Signup Configuration', 'edd-getresponse' ) . '</strong>',
+					'desc' => '',
+					'type' => 'header'
+				),
+				array(
+					'id'   => 'edd_getresponse_checkout_signup',
+					'name' => __( 'Show Signup Checkbox', 'edd-getresponse' ),
+					'desc' => __( 'Allow customers to signup for the list selected above during checkout', 'edd-getresponse' ),
+					'type' => 'checkbox'
+				),
+				array(
+					'id'   => 'edd_getresponse_label',
+					'name' => __( 'Checkbox Label', 'edd-getresponse' ),
+					'desc' => __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
+					'type' => 'text',
+					'size' => 'regular',
+					'std'  => __( 'Sign up for our mailing list', 'edd-getresponse' )
+				),
+				array(
+					'id'   => 'edd_getresponse_debugging',
+					'name' => '<strong>' . __( 'Debugging', 'edd-getresponse' ) . '</strong>',
+					'desc' => '',
+					'type' => 'header'
+				),
+				array(
+					'id'   => 'edd_getresponse_enable_debug',
+					'name' => __( 'Enable Debugging', 'edd-getresponse' ),
+					'desc' => __( 'Check to enable GetResponse debugging. Debug logs will be shown under Reports &rarr; Logs &rarr; Payment Errors.', 'edd-getresponse' ),
+					'type' => 'checkbox'
+				)
+			)
 		);
 
 		$settings = array_merge( $settings, $new_settings );
