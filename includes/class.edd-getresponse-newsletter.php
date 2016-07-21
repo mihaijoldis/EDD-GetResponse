@@ -112,19 +112,34 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	public function subscribe_email( $user_info = array(), $list_id = false ) {
 		if( $api_key = edd_get_option( 'edd_getresponse_api', false ) ) {
 
+			// Maybe add debugging
+			if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
+				edd_record_gateway_error( __( 'GetResponse Debug - List Check', 'edd-getresponse' ), __( 'No list ID predefined, attempting to load site default', 'edd-getresponse' ), 0 );
+			}
+
 			// Retrieve the global list ID
 			if( ! $list_id ) {
 				$list_id = edd_get_option( 'edd_getresponse_list', false );
 				$list_id = $list_id ? $list_id : false;
 
 				if( ! $list_id ) {
+					// Maybe add debugging
+					if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
+						edd_record_gateway_error( __( 'GetResponse Debug - List Check', 'edd-getresponse' ), __( 'No site list ID defined, exiting', 'edd-getresponse' ), 0 );
+					}
+
 					return false;
 				}
 			}
 
 			// Find out if user is already subscribed
-			$query  = '[email]=' . $user_info['email'];
+			$query  = '[email]=' . $user_info['email'] . '&query[campaignId]=' . $list_id;
 			$result = $this->call_api( 'get', 'contacts', $query );
+
+			// Maybe add debugging
+			if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
+				edd_record_gateway_error( __( 'GetResponse Debug - Presubscribe Check', 'edd-getresponse' ), print_r( $result, true ), 0 );
+			}
 
 			$name = $user_info['first_name'] . ' ' . $user_info['last_name'];
 			$name = ( $name == ' ' ) ? $user_info['email'] : $name;
@@ -142,6 +157,11 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 				);
 
 				$result = $this->call_api( 'post', 'contacts', $contact );
+
+				// Maybe add debugging
+				if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
+					edd_record_gateway_error( __( 'GetResponse Debug - API Response', 'edd-getresponse' ), print_r( $result, true ), 0 );
+				}
 
 				if( $result ) {
 					return true;
@@ -185,12 +205,15 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 			} else {
 				if( $query ) {
 					if( $endpoint == 'contacts' ) {
-						$args['body'] = json_encode( $query );
+						$args['body']                    = json_encode( $query );
+						$args['headers']['content-type'] = 'application/json';
 					}
 				}
 
 				$response = wp_remote_post( $url, $args );
 			}
+
+			edd_record_gateway_error( __( 'GetResponse Debug - Initial API Response', 'edd-getresponse' ), print_r( $response, true ), 0 );
 
 			if( ! is_wp_error( $response ) ) {
 				$response = json_decode( wp_remote_retrieve_body( $response ) );
