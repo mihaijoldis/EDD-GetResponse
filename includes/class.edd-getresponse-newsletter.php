@@ -213,7 +213,10 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 				$response = wp_remote_post( $url, $args );
 			}
 
-			edd_record_gateway_error( __( 'GetResponse Debug - Initial API Response', 'edd-getresponse' ), print_r( $response, true ), 0 );
+			// Maybe add debugging
+			if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
+				edd_record_gateway_error( __( 'GetResponse Debug - Initial API Response', 'edd-getresponse' ), print_r( $response, true ), 0 );
+			}
 
 			if( ! is_wp_error( $response ) ) {
 				$response = json_decode( wp_remote_retrieve_body( $response ) );
