@@ -38,7 +38,7 @@ add_filter( 'edd_settings_sections_extensions', 'edd_getresponse_add_settings_se
 function edd_getresponse_add_settings( $settings ) {
 	if( EDD_VERSION >= '2.5' ) {
 		$new_settings = array(
-			'getresponse' => array(
+			'getresponse' => apply_filters( 'edd_getresponse_settings', array(
 				array(
 					'id'   => 'edd_getresponse_api_config',
 					'name' => '<strong>' . __( 'API Configuration', 'edd-getresponse' ) . '</strong>',
@@ -78,20 +78,8 @@ function edd_getresponse_add_settings( $settings ) {
 					'type' => 'text',
 					'size' => 'regular',
 					'std'  => __( 'Sign up for our mailing list', 'edd-getresponse' )
-				),
-				array(
-					'id'   => 'edd_getresponse_debugging',
-					'name' => '<strong>' . __( 'Debugging', 'edd-getresponse' ) . '</strong>',
-					'desc' => '',
-					'type' => 'header'
-				),
-				array(
-					'id'   => 'edd_getresponse_enable_debug',
-					'name' => __( 'Enable Debugging', 'edd-getresponse' ),
-					'desc' => __( 'Check to enable GetResponse debugging. Debug logs will be shown under Reports &rarr; Logs &rarr; Payment Errors.', 'edd-getresponse' ),
-					'type' => 'checkbox'
 				)
-			)
+			) )
 		);
 
 		$settings = array_merge( $settings, $new_settings );
@@ -111,7 +99,7 @@ add_filter( 'edd_settings_extensions', 'edd_getresponse_add_settings' );
  */
 function edd_getresponse_add_settings_pre25( $settings ) {
 	if( EDD_VERSION < '2.5' ) {
-		$new_settings = array(
+		$new_settings = apply_filters( 'edd_getresponse_settings', array(
 			array(
 				'id'   => 'edd_getresponse_settings',
 				'name' => '<strong>' . __( 'GetResponse Settings', 'edd-getresponse' ) . '</strong>',
@@ -146,7 +134,7 @@ function edd_getresponse_add_settings_pre25( $settings ) {
 				'size' => 'regular',
 				'std'  => __( 'Sign up for our mailing list', 'edd-getresponse' )
 			)
-		);
+		) );
 
 		$settings = array_merge( $settings, $new_settings );
 	}
@@ -154,3 +142,34 @@ function edd_getresponse_add_settings_pre25( $settings ) {
 	return $settings;
 }
 add_filter( 'edd_settings_extensions', 'edd_getresponse_add_settings_pre25' );
+
+
+/**
+ * Add debug option if the S214 Debug plugin is enabled
+ *
+ * @since       2.1.2
+ * @param       array $settings The current settings
+ * @return      array $settings The updated settings
+ */
+function edd_getresponse_add_debug( $settings ) {
+	if( class_exists( 'S214_Debug' ) ) {
+		$debug_setting[] = array(
+			'id'   => 'edd_getresponse_debugging',
+			'name' => '<strong>' . __( 'Debugging', 'edd-getresponse' ) . '</strong>',
+			'desc' => '',
+			'type' => 'header'
+		);
+
+		$debug_setting[] = array(
+			'id'   => 'edd_getresponse_enable_debug',
+			'name' => __( 'Enable Debug', 'rcp-mailchimp-pro' ),
+			'desc' => sprintf( __( 'Log plugin errors. You can view errors %s.', 'rcp-ip-restriction' ), '<a href="' . admin_url( 'tools.php?page=s214-debug-logs' ) . '">' . __( 'here', 'rcp-ip-restriction' ) . '</a>' ),
+			'type' => 'checkbox'
+		);
+
+		$settings = array_merge( $settings, $debug_setting );
+	}
+
+	return $settings;
+}
+add_filter( 'edd_getresponse_settings', 'edd_getresponse_add_debug' );

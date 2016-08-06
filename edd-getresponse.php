@@ -3,7 +3,7 @@
  * Plugin Name:     Easy Digital Downloads - GetResponse
  * Plugin URI:      https://easydigitaldownloads.com/extension/getresponse/
  * Description:     Include a GetResponse signup option with your Easy Digital Downloads checkout
- * Version:         2.1.1
+ * Version:         2.1.2
  * Author:          Daniel J Griffiths
  * Author URI:      http://ghost1227.com
  * Text Domain:     edd-getresponse
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 // Plugin version
-define( 'EDD_GETRESPONSE_VERSION', '2.1.1' );
+define( 'EDD_GETRESPONSE_VERSION', '2.1.2' );
 
 
 if( ! class_exists( 'EDD_GetResponse' ) ) {
@@ -49,6 +49,13 @@ if( ! class_exists( 'EDD_GetResponse' ) ) {
 
 
 		/**
+		 * @var         bool $debugging Whether or not debugging is available
+		 * @since       2.1.2
+		 */
+		public $debugging = false;
+
+
+		/**
 		 * Get active instance
 		 *
 		 * @access      public
@@ -63,6 +70,12 @@ if( ! class_exists( 'EDD_GetResponse' ) ) {
 				self::$instance->load_textdomain();
 				self::$instance->hooks();
 				self::$instance->newsletter = new EDD_GetResponse_Newsletter( 'getresponse', 'GetResponse' );
+
+				if( class_exists( 'S214_Debug' ) ) {
+					if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
+						self::$instance->debugging = true;
+					}
+				}
 			}
 
 			return self::$instance;

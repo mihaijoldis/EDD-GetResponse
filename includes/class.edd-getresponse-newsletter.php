@@ -113,8 +113,8 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 		if( $api_key = edd_get_option( 'edd_getresponse_api', false ) ) {
 
 			// Maybe add debugging
-			if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
-				edd_record_gateway_error( __( 'GetResponse Debug - List Check', 'edd-getresponse' ), __( 'No list ID predefined, attempting to load site default', 'edd-getresponse' ), 0 );
+			if( edd_getresponse()->debugging ) {
+				s214_debug_log_error( 'GetResponse Debug - List Check', 'No list ID predefined, attempting to load site default.', 'EDD GetResponse' );
 			}
 
 			// Retrieve the global list ID
@@ -124,8 +124,8 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 
 				if( ! $list_id ) {
 					// Maybe add debugging
-					if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
-						edd_record_gateway_error( __( 'GetResponse Debug - List Check', 'edd-getresponse' ), __( 'No site list ID defined, exiting', 'edd-getresponse' ), 0 );
+					if( edd_getresponse()->debugging ) {
+						s214_debug_log_error( 'GetResponse Debug - List Check', 'No site list ID defined, exiting.', 'EDD GetResponse' );
 					}
 
 					return false;
@@ -137,8 +137,8 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 			$result = $this->call_api( 'get', 'contacts', $query );
 
 			// Maybe add debugging
-			if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
-				edd_record_gateway_error( __( 'GetResponse Debug - Presubscribe Check', 'edd-getresponse' ), print_r( $result, true ), 0 );
+			if( edd_getresponse()->debugging ) {
+				s214_debug_log_error( 'GetResponse Debug - Presubscribe Check', print_r( $result, true ), 'EDD GetResponse' );
 			}
 
 			$name = $user_info['first_name'] . ' ' . $user_info['last_name'];
@@ -159,8 +159,8 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 				$result = $this->call_api( 'post', 'contacts', $contact );
 
 				// Maybe add debugging
-				if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
-					edd_record_gateway_error( __( 'GetResponse Debug - API Response', 'edd-getresponse' ), print_r( $result, true ), 0 );
+				if( edd_getresponse()->debugging ) {
+					s214_debug_log_error( 'GetResponse Debug - API Response', print_r( $result, true ), 'EDD GetResponse' );
 				}
 
 				if( $result ) {
@@ -214,8 +214,8 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 			}
 
 			// Maybe add debugging
-			if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
-				edd_record_gateway_error( __( 'GetResponse Debug - Initial API Response', 'edd-getresponse' ), print_r( $response, true ), 0 );
+			if( edd_getresponse()->debugging ) {
+				s214_debug_log_error( 'GetResponse Debug - Initial API Response', print_r( $response, true ), 'EDD GetResponse' );
 			}
 
 			if( ! is_wp_error( $response ) ) {
