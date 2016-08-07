@@ -162,8 +162,8 @@ function edd_getresponse_add_debug( $settings ) {
 
 		$debug_setting[] = array(
 			'id'   => 'edd_getresponse_enable_debug',
-			'name' => __( 'Enable Debug', 'rcp-mailchimp-pro' ),
-			'desc' => sprintf( __( 'Log plugin errors. You can view errors %s.', 'rcp-ip-restriction' ), '<a href="' . admin_url( 'tools.php?page=s214-debug-logs' ) . '">' . __( 'here', 'rcp-ip-restriction' ) . '</a>' ),
+			'name' => __( 'Enable Debug', 'edd-getresponse' ),
+			'desc' => sprintf( __( 'Log plugin errors. You can view errors %s.', 'edd-getresponse' ), '<a href="' . admin_url( 'tools.php?page=s214-debug-logs' ) . '">' . __( 'here', 'edd-getresponse' ) . '</a>' ),
 			'type' => 'checkbox'
 		);
 
