@@ -190,7 +190,6 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 			$url = EDD_GETRESPONSE_API_URL . '/' . $endpoint;
 
 			$args = array(
-				'timeout' => 0,
 				'headers' => array(
 					'X-Auth-Token' => 'api-key ' . $api_key
 				)
