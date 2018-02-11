@@ -236,7 +236,7 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	 * @return      void
 	 */
 	public function display_api_errors() {
-		if( $this->api_error ) {
+		if( $this->api_error && edd_get_option( 'edd_getresponse_api', false ) ) {
 			$error  = '<div class="error settings-error notice">';
 			$error .= '<p>' . sprintf( __( '<strong>GetResponse API returned the following error:</strong> %s', 'edd-getresponse' ), $this->api_error ) . '</p>';
 			$error .= '</div>';
