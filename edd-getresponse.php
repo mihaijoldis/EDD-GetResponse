@@ -40,20 +40,11 @@ if( ! class_exists( 'EDD_GetResponse' ) ) {
 		 */
 		private static $instance;
 
-
 		/**
 		 * @var         EDD_GetResponse_Newsletter $newsletter The newsletter instance
 		 * @since       2.0.0
 		 */
 		public $newsletter;
-
-
-		/**
-		 * @var         bool $debugging Whether or not debugging is available
-		 * @since       2.1.2
-		 */
-		public $debugging = false;
-
 
 		/**
 		 * Get active instance
@@ -71,11 +62,6 @@ if( ! class_exists( 'EDD_GetResponse' ) ) {
 				self::$instance->hooks();
 				self::$instance->newsletter = new EDD_GetResponse_Newsletter( 'getresponse', 'GetResponse' );
 
-				if( class_exists( 'S214_Debug' ) ) {
-					if( edd_get_option( 'edd_getresponse_enable_debug', false ) ) {
-						self::$instance->debugging = true;
-					}
-				}
 			}
 
 			return self::$instance;

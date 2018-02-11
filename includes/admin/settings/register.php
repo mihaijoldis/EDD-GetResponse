@@ -142,34 +142,3 @@ function edd_getresponse_add_settings_pre25( $settings ) {
 	return $settings;
 }
 add_filter( 'edd_settings_extensions', 'edd_getresponse_add_settings_pre25' );
-
-
-/**
- * Add debug option if the S214 Debug plugin is enabled
- *
- * @since       2.1.2
- * @param       array $settings The current settings
- * @return      array $settings The updated settings
- */
-function edd_getresponse_add_debug( $settings ) {
-	if( class_exists( 'S214_Debug' ) ) {
-		$debug_setting[] = array(
-			'id'   => 'edd_getresponse_debugging',
-			'name' => '<strong>' . __( 'Debugging', 'edd-getresponse' ) . '</strong>',
-			'desc' => '',
-			'type' => 'header'
-		);
-
-		$debug_setting[] = array(
-			'id'   => 'edd_getresponse_enable_debug',
-			'name' => __( 'Enable Debug', 'edd-getresponse' ),
-			'desc' => sprintf( __( 'Log plugin errors. You can view errors %s.', 'edd-getresponse' ), '<a href="' . admin_url( 'tools.php?page=s214-debug-logs' ) . '">' . __( 'here', 'edd-getresponse' ) . '</a>' ),
-			'type' => 'checkbox'
-		);
-
-		$settings = array_merge( $settings, $debug_setting );
-	}
-
-	return $settings;
-}
-add_filter( 'edd_getresponse_settings', 'edd_getresponse_add_debug' );
