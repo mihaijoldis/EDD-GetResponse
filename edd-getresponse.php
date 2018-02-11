@@ -4,13 +4,13 @@
  * Plugin URI:      https://easydigitaldownloads.com/extension/getresponse/
  * Description:     Include a GetResponse signup option with your Easy Digital Downloads checkout
  * Version:         2.1.2
- * Author:          Daniel J Griffiths
- * Author URI:      http://ghost1227.com
+ * Author:          Easy Digital Downloads, LLC
+ * Author URI:      https://easydigitaldownloads.com
  * Text Domain:     edd-getresponse
  *
  * @package         EDD\GetResponse
- * @author          Daniel J Griffiths <dgriffiths@ghost1227.com>
- * @copyright       Copyright (c) 2013-2014, Daniel J Griffiths
+ * @author          Easy Digital Downloads <support@easydigitaldownloads.com>
+ * @copyright       Copyright (c) 2018 Easy Digital Downloads, LLC
  */
 
 
