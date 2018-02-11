@@ -192,3 +192,15 @@ function edd_getresponse() {
 	}
 }
 add_action( 'plugins_loaded', 'edd_getresponse' );
+
+
+/**
+ * Install initial settings on activation
+ *
+ * @since 2.1.3
+ * @return void
+ */
+function edd_getresponse_install() {
+	update_option( 'edd_getresponse_version', EDD_GETRESPONSE_VERSION );
+}
+register_activation_hook( __FILE__, 'edd_getresponse_install' );
