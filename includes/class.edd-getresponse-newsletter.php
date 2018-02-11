@@ -112,8 +112,10 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	public function subscribe_email( $user_info = array(), $list_id = false ) {
 		if( $api_key = edd_get_option( 'edd_getresponse_api', false ) ) {
 
-			// Maybe add debugging
-			edd_debug_log( 'GetResponse Debug - List Check. No list ID predefined, attempting to load site default.' );
+
+			if( function_exists( 'edd_debug_log' ) ) {
+				edd_debug_log( 'GetResponse Debug - List Check. No list ID predefined, attempting to load site default.' );
+			}
 
 			// Retrieve the global list ID
 			if( ! $list_id ) {
@@ -121,9 +123,11 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 				$list_id = $list_id ? $list_id : false;
 
 				if( ! $list_id ) {
-					// Maybe add debugging
-					edd_debug_log( 'GetResponse Debug - List Check. No site list ID defined, exiting.' );
-			
+		
+					if( function_exists( 'edd_debug_log' ) ) {
+						edd_debug_log( 'GetResponse Debug - List Check. No site list ID defined, exiting.' );
+					}
+
 					return false;
 				}
 			}
@@ -132,9 +136,11 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 			$query  = '[email]=' . $user_info['email'] . '&query[campaignId]=' . $list_id;
 			$result = $this->call_api( 'get', 'contacts', $query );
 
-			// Maybe add debugging
-			edd_debug_log( 'GetResponse Debug - Presubscribe Check: ' . print_r( $result, true ) );
-			
+
+			if( function_exists( 'edd_debug_log' ) ) {
+				edd_debug_log( 'GetResponse Debug - Presubscribe Check: ' . print_r( $result, true ) );
+			}
+
 			$name = $user_info['first_name'] . ' ' . $user_info['last_name'];
 			$name = ( $name == ' ' ) ? $user_info['email'] : $name;
 
@@ -152,8 +158,10 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 
 				$result = $this->call_api( 'post', 'contacts', $contact );
 
-				// Maybe add debugging
-				edd_debug_log( 'GetResponse Debug - API Response: ' . print_r( $result, true ) );
+	
+				if( function_exists( 'edd_debug_log' ) ) {
+					edd_debug_log( 'GetResponse Debug - API Response: ' . print_r( $result, true ) );
+				}
 
 				if( $result ) {
 					return true;
@@ -205,8 +213,10 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 				$response = wp_remote_post( $url, $args );
 			}
 
-			// Maybe add debugging
-			edd_debug_log( 'GetResponse Debug - Initial API Response: ' . print_r( $response, true ) );
+
+			if( function_exists( 'edd_debug_log' ) ) {
+				edd_debug_log( 'GetResponse Debug - Initial API Response: ' . print_r( $response, true ) );
+			}
 
 			if( ! is_wp_error( $response ) ) {
 				$response = json_decode( wp_remote_retrieve_body( $response ) );
