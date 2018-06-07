@@ -72,6 +72,12 @@ function edd_getresponse_add_settings( $settings ) {
 					'type' => 'checkbox'
 				),
 				array(
+					'id'      => 'edd_getresponse_checkout_signup_default_value',
+					'name'    => __( 'Signup Checked by Default', 'edd-getresponse' ),
+					'desc'    => __( 'Should the newsletter signup checkbox shown during checkout be checked by default?', 'edd-getresponse' ),
+					'type'    => 'checkbox'
+				),
+				array(
 					'id'   => 'edd_getresponse_label',
 					'name' => __( 'Checkbox Label', 'edd-getresponse' ),
 					'desc' => __( 'Define a custom label for the GetResponse subscription checkbox', 'edd-getresponse' ),
