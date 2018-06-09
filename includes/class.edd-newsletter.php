@@ -149,7 +149,7 @@ class EDD_Newsletter {
 		<fieldset id="edd_<?php echo $this->id; ?>">
 			<p>
                 <label for="edd_<?php echo $this->id; ?>_signup">
-				    <input name="edd_<?php echo $this->id; ?>_signup" id="edd_<?php echo $this->id; ?>_signup" type="checkbox" <?php if ( $checked ) { echo 'checked="checked"'; } ?>/>
+				    <input name="edd_<?php echo $this->id; ?>_signup" id="edd_<?php echo $this->id; ?>_signup" type="checkbox" <?php checked( '1', $checked, true ); ?>/>
                     <?php echo $this->checkout_label; ?>
                 </label>
             </p>
