@@ -143,11 +143,13 @@ class EDD_Newsletter {
 		if( ! $this->show_checkout_signup() )
 			return;
 
+		$checked = edd_get_option( 'edd_getresponse_checkout_signup_default_value', false );
+
 		ob_start(); ?>
 		<fieldset id="edd_<?php echo $this->id; ?>">
 			<p>
                 <label for="edd_<?php echo $this->id; ?>_signup">
-				    <input name="edd_<?php echo $this->id; ?>_signup" id="edd_<?php echo $this->id; ?>_signup" type="checkbox" checked="checked"/>
+				    <input name="edd_<?php echo $this->id; ?>_signup" id="edd_<?php echo $this->id; ?>_signup" type="checkbox" <?php checked( '1', $checked, true ); ?>/>
                     <?php echo $this->checkout_label; ?>
                 </label>
             </p>
