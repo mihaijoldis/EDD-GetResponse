@@ -164,7 +164,8 @@ class EDD_Newsletter {
 	public function check_for_email_signup( $payment_id = 0, $payment_data = array() ) {
 		// Check for global newsletter
 		if( isset( $_POST['edd_' . $this->id . '_signup'] ) ) {
-			add_post_meta( $payment_id, '_edd_' . $this->id . '_signup', '1' );
+			$payment = edd_get_payment( $payment_id );
+			$payment->add_meta( '_edd_' . $this->id . '_signup', '1' );
 		}
 	}
 
@@ -172,8 +173,12 @@ class EDD_Newsletter {
 	 * Check if a customer needs to be subscribed on completed purchase of specific products
 	 */
 	public function completed_download_purchase_signup( $download_id = 0, $payment_id = 0, $download_type = 'default' ) {
-		// Check for signup during checkout
-		if( get_post_meta( $payment_id, '_edd_' . $this->id . '_signup', true ) ) {
+		// Get the Payment object
+		$payment = edd_get_payment( $payment_id );
+		$meta = $payment->get_meta( '_edd_' . $this->id . '_signup', true );
+
+		// Check for signup during checkout meta exists
+		if( $meta ) {
 			$user_info = edd_get_payment_meta_user_info( $payment_id );
 			$lists     = get_post_meta( $download_id, '_edd_' . $this->id, true );			
 
@@ -217,7 +222,7 @@ class EDD_Newsletter {
 			}
 
 			// Cleanup after ourselves
-			delete_post_meta( $payment_id, '_edd_' . $this->id . '_signup' );
+			$payment->delete_meta( '_edd_' . $this->id . '_signup' );
 		}
 	}
 
