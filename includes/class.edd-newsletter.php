@@ -119,7 +119,7 @@ class EDD_Newsletter {
 		add_filter( 'edd_metabox_fields_save', array( $this, 'save_metabox' ) );
 		add_filter( 'edd_settings_extensions', array( $this, 'settings' ) );
 		add_action( 'edd_purchase_form_before_submit', array( $this, 'checkout_fields' ), 100 );
-		add_action( 'edd_checkout_before_gateway', array( $this, 'checkout_signup' ), 10, 3 );
+		add_action( 'edd_insert_payment', array( $this, 'check_for_email_signup' ), 10, 2 );
 		add_action( 'edd_complete_download_purchase', array( $this, 'completed_download_purchase_signup' ), 10, 3 );
 
 		$this->init();
@@ -161,51 +161,64 @@ class EDD_Newsletter {
 	/**
 	 * Check if a customer needs to be subscribed at checkout
 	 */
-	public function checkout_signup( $posted, $user_info, $valid_data ) {
-
+	public function check_for_email_signup( $payment_id = 0, $payment_data = array() ) {
 		// Check for global newsletter
-		if( isset( $posted['edd_' . $this->id . '_signup'] ) ) {
-
-			$this->subscribe_email( $user_info );
-
+		if( isset( $_POST['edd_' . $this->id . '_signup'] ) ) {
+			add_post_meta( $payment_id, '_edd_' . $this->id . '_signup', '1' );
 		}
-
 	}
 
 	/**
 	 * Check if a customer needs to be subscribed on completed purchase of specific products
 	 */
 	public function completed_download_purchase_signup( $download_id = 0, $payment_id = 0, $download_type = 'default' ) {
+		// Check for signup during checkout
+		if( get_post_meta( $payment_id, '_edd_' . $this->id . '_signup', true ) ) {
+			$user_info = edd_get_payment_meta_user_info( $payment_id );
+			$lists     = get_post_meta( $download_id, '_edd_' . $this->id, true );			
 
-		$user_info = edd_get_payment_meta_user_info( $payment_id );
-		$lists     = get_post_meta( $download_id, '_edd_' . $this->id, true );
-
-		if( 'bundle' == $download_type ) {
-
-			// Get the lists of all items included in the bundle
-
-			$downloads = edd_get_bundled_products( $download_id );
-			if( $downloads ) {
-				foreach( $downloads as $d_id ) {
-					$d_lists = get_post_meta( $d_id, '_edd_' . $this->id, true );
-					if ( is_array( $d_lists ) ) {
-						$lists = array_merge( $d_lists, (array) $lists );
+			if( 'bundle' == $download_type ) {
+				// Get the lists of all items included in the bundle
+				$downloads = edd_get_bundled_products( $download_id );
+				if( $downloads ) {
+					foreach( $downloads as $d_id ) {
+						$d_lists = get_post_meta( $d_id, '_edd_' . $this->id, true );
+						if ( is_array( $d_lists ) ) {
+							$lists = array_merge( $d_lists, (array) $lists );
+						}
 					}
 				}
 			}
+
+			if( empty( $lists ) ) {
+				if( function_exists( 'edd_debug_log' ) ) {
+					edd_debug_log( 'GetResponse Debug - List Check. No list ID predefined, attempting to load site default.' );
+				}
+
+				// No Download list set so return global list ID
+				$list_id = edd_get_option( 'edd_getresponse_list', false );
+
+				if( ! $list_id ) {
+					if( function_exists( 'edd_debug_log' ) ) {
+						edd_debug_log( 'GetResponse Debug - List Check. No site list ID defined, exiting.' );
+					}
+
+					return false;
+				}
+
+				$this->subscribe_email( $user_info, $list_id );
+				return;
+			}
+
+			$lists = array_unique( $lists );
+
+			foreach( $lists as $list ) {
+				$this->subscribe_email( $user_info, $list );
+			}
+
+			// Cleanup after ourselves
+			delete_post_meta( $payment_id, '_edd_' . $this->id . '_signup' );
 		}
-
-		if( empty( $lists ) )
-			return;
-
-		$lists = array_unique( $lists );
-
-		foreach( $lists as $list ) {
-
-			$this->subscribe_email( $user_info, $list );
-
-		}
-
 	}
 
 	/**
@@ -224,7 +237,7 @@ class EDD_Newsletter {
 
 		global $post;
 
-		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
+		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing. Overrides global setting.', 'edd-getresponse' ) . '</p>';
 
 		$checked = (array) get_post_meta( $post->ID, '_edd_' . esc_attr( $this->id ), true );
 		foreach( $this->get_lists() as $list_id => $list_name ) {
