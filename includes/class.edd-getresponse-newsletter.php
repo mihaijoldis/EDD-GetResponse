@@ -112,30 +112,9 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 	public function subscribe_email( $user_info = array(), $list_id = false ) {
 		if( $api_key = edd_get_option( 'edd_getresponse_api', false ) ) {
 
-
-			if( function_exists( 'edd_debug_log' ) ) {
-				edd_debug_log( 'GetResponse Debug - List Check. No list ID predefined, attempting to load site default.' );
-			}
-
-			// Retrieve the global list ID
-			if( ! $list_id ) {
-				$list_id = edd_get_option( 'edd_getresponse_list', false );
-				$list_id = $list_id ? $list_id : false;
-
-				if( ! $list_id ) {
-		
-					if( function_exists( 'edd_debug_log' ) ) {
-						edd_debug_log( 'GetResponse Debug - List Check. No site list ID defined, exiting.' );
-					}
-
-					return false;
-				}
-			}
-
 			// Find out if user is already subscribed
 			$query  = '[email]=' . $user_info['email'] . '&query[campaignId]=' . $list_id;
 			$result = $this->call_api( 'get', 'contacts', $query );
-
 
 			if( function_exists( 'edd_debug_log' ) ) {
 				edd_debug_log( 'GetResponse Debug - Presubscribe Check: ' . print_r( $result, true ) );
@@ -157,7 +136,6 @@ class EDD_GetResponse_Newsletter extends EDD_Newsletter {
 				);
 
 				$result = $this->call_api( 'post', 'contacts', $contact );
-
 	
 				if( function_exists( 'edd_debug_log' ) ) {
 					edd_debug_log( 'GetResponse Debug - API Response: ' . print_r( $result, true ) );
