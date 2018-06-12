@@ -21,7 +21,7 @@ if( ! defined( 'ABSPATH' ) ) {
  * @return      array The modified extensions settings
  */
 function edd_getresponse_add_settings_section( $sections ) {
-	$sections['getresponse'] = __( 'GetResponse', 'edd-free-downloads' );
+	$sections['getresponse'] = __( 'GetResponse', 'edd-getresponse' );
 
 	return $sections;
 }
@@ -55,7 +55,7 @@ function edd_getresponse_add_settings( $settings ) {
 				array(
 					'id'      => 'edd_getresponse_list',
 					'name'    => __( 'Choose A Campaign', 'edd-getresponse' ),
-					'desc'    => __( 'Select the campaign you wish to subscribe buyers to', 'edd-getresponse' ),
+					'desc'    => __( 'Select the default campaign you wish to subscribe customers to. Can be overridden on a per download level.', 'edd-getresponse' ),
 					'type'    => 'select',
 					'options' => edd_getresponse()->newsletter->get_lists()
 				),
